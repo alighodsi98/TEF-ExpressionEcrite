@@ -1,0 +1,36 @@
+# --- Dependencies ---
+node_modules/
+
+# --- Next.js build output ---
+.next/
+
+# --- Build artifacts ---
+dist-portable/
+dist-electron/
+build-resources/node.exe
+
+# --- Environment & secrets (DO NOT COMMIT) ---
+.env
+.env.local
+.env.*.local
+
+# --- Logs ---
+*.log
+server.log
+
+# --- Prisma ---
+# The runtime DB is app data, not source. Keep only migrations + schema.
+prisma/db/*.db
+prisma/db/*.db-journal
+prisma/db/*.db-wal
+prisma/db/*.db-shm
+
+# --- OS / editor ---
+.DS_Store
+Thumbs.db
+tsconfig.tsbuildinfo
+
+# --- Misc ---
+tsc_output.txt
+upload/
+Criteria/

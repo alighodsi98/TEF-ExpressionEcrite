@@ -1,0 +1,209 @@
+// TEF Canada - Expression Écrite Practice App
+// Prisma schema (SQLite)
+
+generator client {
+  provider        = "prisma-client-js"
+  engineType      = "library"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// ---------------------------------------------------------------------------
+// User profile (single-user app, but stored as a record for extensibility)
+// ---------------------------------------------------------------------------
+model UserProfile {
+  id                String   @id @default(cuid())
+  name              String
+  targetNclc        Int      @default(7)
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  // Placement test outcome
+  placementDone     Boolean  @default(false)
+  placementMode     String?  // lenient | realistic | strict
+  levelSectionA     String?  // NCLC level e.g. "5"
+  levelSectionB     String?
+  levelOverallNclc  String?
+  levelOverallCecr  String?  // A1..C2
+
+  // AI configuration
+  aiApiKey            String?  // OpenRouter API key (or custom provider key, e.g. 9router)
+  aiModel             String?  // e.g. "google/gemini-2.5-flash"
+  aiBaseUrl           String?  // Custom OpenAI-compatible endpoint, e.g. "http://localhost:20128/v1" (9router). Empty = OpenRouter
+  smartMissionsEnabled Boolean @default(true)
+
+  sessions            Session[]
+  smartMissions       SmartMission[]
+  glossaryEntries     GlossaryEntry[]
+  chatConversations   ChatConversation[]
+}
+
+// ---------------------------------------------------------------------------
+// User-manageable catalogue of AI models (add / edit / delete from settings)
+// ---------------------------------------------------------------------------
+model AiModel {
+  id        String   @id @default(cuid())
+  modelId   String   @unique // OpenRouter model identifier, e.g. "openai/gpt-4o"
+  name      String            // display name
+  category  String   @default("custom") // paid | free | custom
+  sortOrder Int      @default(0)
+  createdAt DateTime @default(now())
+}
+
+// ---------------------------------------------------------------------------
+// Personal glossary: words/sentences saved from C1 AI rewrites
+// ---------------------------------------------------------------------------
+model GlossaryEntry {
+  id        String   @id @default(cuid())
+  userId    String
+  section   String   // "A" | "B"
+  phrase    String
+  context   String?  // optional user note
+  createdAt DateTime @default(now())
+
+  // Spaced-repetition review (Leitner boxes 0-5)
+  reviewBox      Int       @default(0) // 0 = new/failed, 5 = mastered
+  reviewCount    Int       @default(0)
+  lastReviewedAt DateTime?
+  nextReviewAt   DateTime? // null = never reviewed -> due immediately
+
+  user      UserProfile @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+// ---------------------------------------------------------------------------
+// Pre-defined topic bank (section A fait divers + section B lettre)
+// ---------------------------------------------------------------------------
+model TopicBank {
+  id              String   @id @default(cuid())
+  section         String   // "A" | "B"
+  topic           String
+  starterSentence String?  // section A: opening sentence
+  context         String?  // section B: situational context
+  category        String?  // e.g. "education", "sante", "societe"
+  isDynamic       Boolean  @default(false)
+  written         Boolean  @default(false)
+  createdAt       DateTime @default(now())
+}
+
+// ---------------------------------------------------------------------------
+// A practice / placement / targeted session
+// ---------------------------------------------------------------------------
+model Session {
+  id          String   @id @default(cuid())
+  userId      String
+  type        String   // placement | practice
+  createdAt   DateTime @default(now())
+
+  user          UserProfile  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  exercises     Exercise[]
+  smartMission  SmartMission?
+}
+
+// ---------------------------------------------------------------------------
+// A single writing exercise (Section A or B) within a session
+// ---------------------------------------------------------------------------
+model Exercise {
+  id              String   @id @default(cuid())
+  sessionId       String
+  section         String   // "A" | "B"
+  topic           String
+  starterSentence String?  // section A
+  context         String?  // section B context
+  userText        String
+  wordCount       Int
+  durationSec     Int
+  submittedAt     DateTime @default(now())
+
+  session     Session      @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  corrections Correction[]
+
+  @@index([sessionId])
+}
+
+// ---------------------------------------------------------------------------
+// AI correction (4 levels) + 10-criterion scoring + analytics
+// ---------------------------------------------------------------------------
+model Correction {
+  id                String   @id @default(cuid())
+  exerciseId        String
+  mode              String   @default("realistic") // lenient | realistic | strict
+
+  // Level 1: overt errors (spelling, conjugation, obvious grammar)
+  level1Errors      String   // JSON: [{type, original, correction, explanation}]
+  // Level 2: better word / verb alternatives given context
+  level2Suggestions String   // JSON: [{original, suggestion, reason}]
+  // Level 3: advanced syntax & stylistic improvements
+  level3Advanced    String   // JSON: [{original, improved, explanation}]
+  // Level 4: full C1 rewrite for reference
+  level4Rewrite     String
+
+  // 10 official TEF scoring criteria (each 0-10)
+  scores            String   // JSON object of 10 criteria
+  nclcLevel         String
+  cecrLevel         String
+  globalScore       Float    // 0-699 TEF global score
+
+  // Analytics from AI correction
+  grammarIssues     String   // JSON: [{topic, count, examples:[]}]
+  vocabularyIssues  String   // JSON: [{word, issue, context}]
+  feedback          String   // overall feedback in French
+
+  createdAt         DateTime @default(now())
+  exercise          Exercise @relation(fields: [exerciseId], references: [id], onDelete: Cascade)
+
+  @@unique([exerciseId, mode])
+}
+
+// ---------------------------------------------------------------------------
+// Smart mission suggested after each session
+// ---------------------------------------------------------------------------
+model SmartMission {
+  id          String   @id @default(cuid())
+  userId      String
+  sessionId   String   @unique
+  topic       String   // grammar topic key
+  message     String   // display message (Persian)
+  stat        String   // e.g. "70%"
+  createdAt   DateTime @default(now())
+  accepted    Boolean  @default(false)
+  dismissed   Boolean  @default(false)
+
+  user        UserProfile @relation(fields: [userId], references: [id], onDelete: Cascade)
+  session     Session     @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+}
+
+// ---------------------------------------------------------------------------
+// AI chat conversations (saved chat history)
+// ---------------------------------------------------------------------------
+model ChatConversation {
+  id        String   @id @default(cuid())
+  userId    String
+  title     String   // auto-generated from first user message
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user      UserProfile   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  messages  ChatMessage[]
+
+  @@index([userId])
+}
+
+// ---------------------------------------------------------------------------
+// Individual messages within a chat conversation
+// ---------------------------------------------------------------------------
+model ChatMessage {
+  id              String   @id @default(cuid())
+  conversationId  String
+  role            String   // "user" | "assistant"
+  content         String
+  createdAt       DateTime @default(now())
+
+  conversation    ChatConversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+
+  @@index([conversationId])
+}

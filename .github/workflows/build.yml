@@ -1,0 +1,61 @@
+name: Build Windows Packages
+
+on:
+  push:
+    tags:
+      - "v*"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build-windows:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Generate Prisma client
+        run: npx prisma generate
+
+      - name: Create empty database (schema + migrations)
+        run: npx prisma db push
+        env:
+          # Relative to prisma/schema.prisma
+          DATABASE_URL: file:./db/custom.db
+
+      - name: Build packages (NSIS + portable)
+        run: npm run electron:build
+        env:
+          # Secrets are injected as env vars at build time; NEVER hardcode keys in the repo.
+          OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
+          DATABASE_URL: file:./db/custom.db
+
+      - name: Upload installers as workflow artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: windows-installers
+          path: |
+            dist-electron/*.exe
+            dist-electron/*.yml
+            dist-electron/*.blockmap
+
+      - name: Publish GitHub Release (on version tags)
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            dist-electron/*.exe
+            dist-electron/*.yml
+          generate_release_notes: true

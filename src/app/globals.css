@@ -1,0 +1,333 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "@mdxeditor/editor/style.css";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-vazirmatn), var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-geist-mono);
+  --font-french: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar: var(--sidebar);
+  --color-chart-5: var(--chart-5);
+  --color-chart-4: var(--chart-4);
+  --color-chart-3: var(--chart-3);
+  --color-chart-2: var(--chart-2);
+  --color-chart-1: var(--chart-1);
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-border: var(--border);
+  --color-destructive: var(--destructive);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+}
+
+:root {
+  --radius: 0.75rem;
+  /* Warm off-white background, deep slate text */
+  --background: oklch(0.985 0.006 95);
+  --foreground: oklch(0.20 0.02 200);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.20 0.02 200);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.20 0.02 200);
+  /* Emerald primary - growth & education */
+  --primary: oklch(0.52 0.13 165);
+  --primary-foreground: oklch(0.99 0.005 95);
+  --secondary: oklch(0.96 0.012 165);
+  --secondary-foreground: oklch(0.30 0.04 165);
+  --muted: oklch(0.965 0.008 95);
+  --muted-foreground: oklch(0.50 0.02 200);
+  /* Warm amber accent - French elegance */
+  --accent: oklch(0.90 0.06 85);
+  --accent-foreground: oklch(0.35 0.10 70);
+  --destructive: oklch(0.58 0.22 27);
+  --border: oklch(0.90 0.008 165);
+  --input: oklch(0.92 0.006 95);
+  --ring: oklch(0.52 0.13 165);
+  /* Chart colors: emerald, amber, rose, teal, orange */
+  --chart-1: oklch(0.55 0.13 165);
+  --chart-2: oklch(0.75 0.15 75);
+  --chart-3: oklch(0.62 0.20 20);
+  --chart-4: oklch(0.60 0.10 200);
+  --chart-5: oklch(0.70 0.18 50);
+  --sidebar: oklch(0.99 0.004 95);
+  --sidebar-foreground: oklch(0.20 0.02 200);
+  --sidebar-primary: oklch(0.52 0.13 165);
+  --sidebar-primary-foreground: oklch(0.99 0.005 95);
+  --sidebar-accent: oklch(0.95 0.015 165);
+  --sidebar-accent-foreground: oklch(0.30 0.04 165);
+  --sidebar-border: oklch(0.90 0.008 165);
+  --sidebar-ring: oklch(0.52 0.13 165);
+}
+
+.dark {
+  --background: oklch(0.17 0.015 220);
+  --foreground: oklch(0.96 0.006 95);
+  --card: oklch(0.21 0.018 220);
+  --card-foreground: oklch(0.96 0.006 95);
+  --popover: oklch(0.21 0.018 220);
+  --popover-foreground: oklch(0.96 0.006 95);
+  --primary: oklch(0.70 0.15 165);
+  --primary-foreground: oklch(0.16 0.02 220);
+  --secondary: oklch(0.27 0.02 220);
+  --secondary-foreground: oklch(0.96 0.006 95);
+  --muted: oklch(0.26 0.015 220);
+  --muted-foreground: oklch(0.72 0.015 200);
+  --accent: oklch(0.40 0.07 75);
+  --accent-foreground: oklch(0.92 0.08 85);
+  --destructive: oklch(0.70 0.19 22);
+  --border: oklch(1 0 0 / 10%);
+  --input: oklch(1 0 0 / 12%);
+  --ring: oklch(0.70 0.15 165);
+  --chart-1: oklch(0.70 0.15 165);
+  --chart-2: oklch(0.78 0.15 75);
+  --chart-3: oklch(0.68 0.20 20);
+  --chart-4: oklch(0.66 0.11 200);
+  --chart-5: oklch(0.72 0.18 50);
+  --sidebar: oklch(0.19 0.015 220);
+  --sidebar-foreground: oklch(0.96 0.006 95);
+  --sidebar-primary: oklch(0.70 0.15 165);
+  --sidebar-primary-foreground: oklch(0.16 0.02 220);
+  --sidebar-accent: oklch(0.27 0.02 220);
+  --sidebar-accent-foreground: oklch(0.96 0.006 95);
+  --sidebar-border: oklch(1 0 0 / 10%);
+  --sidebar-ring: oklch(0.70 0.15 165);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  html {
+    scroll-behavior: smooth;
+  }
+  body {
+    @apply bg-background text-foreground;
+    font-feature-settings: "ss01", "cv01";
+  }
+  /* French text containers use LTR even in RTL layout */
+  [dir="ltr"] {
+    text-align: left;
+  }
+}
+
+/* Custom scrollbar for long lists */
+.tef-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: oklch(0.75 0.04 165 / 0.5) transparent;
+}
+.tef-scroll::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+.tef-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+.tef-scroll::-webkit-scrollbar-thumb {
+  background-color: oklch(0.75 0.04 165 / 0.4);
+  border-radius: 9999px;
+}
+.tef-scroll::-webkit-scrollbar-thumb:hover {
+  background-color: oklch(0.70 0.10 165 / 0.6);
+}
+
+/* Subtle entrance animation utility */
+@keyframes tef-fade-up {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.tef-fade-up {
+  animation: tef-fade-up 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes tef-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+.tef-fade-in {
+  animation: tef-fade-in 0.4s ease-out both;
+}
+
+@keyframes tef-scale-in {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
+.tef-scale-in {
+  animation: tef-scale-in 0.35s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes tef-slide-down {
+  from { opacity: 0; transform: translateY(-8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.tef-slide-down {
+  animation: tef-slide-down 0.3s ease-out both;
+}
+
+@keyframes tef-shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+.tef-shimmer {
+  background: linear-gradient(90deg, transparent 25%, oklch(1 0 0 / 0.08) 50%, transparent 75%);
+  background-size: 200% 100%;
+  animation: tef-shimmer 1.8s ease-in-out infinite;
+}
+
+/* Diff highlight colors for corrections */
+.tef-del {
+  background: oklch(0.92 0.05 20 / 0.5);
+  text-decoration: line-through;
+  text-decoration-color: oklch(0.5 0.2 25);
+  border-radius: 3px;
+  padding: 0 2px;
+}
+.dark .tef-del {
+  background: oklch(0.35 0.08 25 / 0.5);
+  text-decoration-color: oklch(0.70 0.18 25);
+}
+.tef-add {
+  background: oklch(0.90 0.08 165 / 0.45);
+  color: oklch(0.35 0.13 165);
+  border-radius: 3px;
+  padding: 0 2px;
+  font-weight: 500;
+}
+.dark .tef-add {
+  background: oklch(0.30 0.08 165 / 0.45);
+  color: oklch(0.78 0.14 165);
+}
+
+/* Timer pulse when low */
+@keyframes tef-pulse-red {
+  0%, 100% { color: oklch(0.55 0.22 25); }
+  50% { color: oklch(0.70 0.25 25); }
+}
+.tef-timer-low {
+  animation: tef-pulse-red 1s ease-in-out infinite;
+}
+
+/* Smooth hover lift for interactive cards */
+.tef-hover-lift {
+  transition: transform 0.2s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.2s ease;
+}
+.tef-hover-lift:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px oklch(0 0 0 / 0.06);
+}
+
+/* Glow ring for primary actions */
+.tef-glow {
+  box-shadow: 0 0 0 0 oklch(0.52 0.13 165 / 0);
+  transition: box-shadow 0.3s ease;
+}
+.tef-glow:hover {
+  box-shadow: 0 0 0 4px oklch(0.52 0.13 165 / 0.12);
+}
+
+/* Stagger children animation */
+.tef-stagger > * {
+  animation: tef-fade-up 0.4s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+.tef-stagger > *:nth-child(1) { animation-delay: 0ms; }
+.tef-stagger > *:nth-child(2) { animation-delay: 60ms; }
+.tef-stagger > *:nth-child(3) { animation-delay: 120ms; }
+.tef-stagger > *:nth-child(4) { animation-delay: 180ms; }
+.tef-stagger > *:nth-child(5) { animation-delay: 240ms; }
+.tef-stagger > *:nth-child(6) { animation-delay: 300ms; }
+
+/* Chat markdown styles */
+.chat-markdown p { margin: 0.5em 0; line-height: 1.65; }
+.chat-markdown p:first-child { margin-top: 0; }
+.chat-markdown p:last-child { margin-bottom: 0; }
+.chat-markdown ul, .chat-markdown ol { margin: 0.5em 0; padding-left: 1.4em; }
+.chat-markdown li { margin: 0.2em 0; }
+.chat-markdown strong { font-weight: 600; }
+.chat-markdown em { font-style: italic; }
+.chat-markdown code {
+  background: oklch(0.92 0 0 / 0.6);
+  padding: 0.15em 0.4em;
+  border-radius: 5px;
+  font-size: 0.88em;
+  font-family: var(--font-geist-mono), monospace;
+}
+.chat-markdown :not(pre) > code {
+  background: oklch(0.92 0 0 / 0.6);
+}
+.chat-markdown pre {
+  background: oklch(0.15 0 0);
+  color: oklch(0.9 0 0);
+  padding: 0.7em 0.9em;
+  border-radius: 8px;
+  overflow-x: auto;
+  margin: 0.6em 0;
+  font-size: 0.85em;
+}
+.chat-markdown pre code {
+  background: none;
+  padding: 0;
+  color: inherit;
+  font-size: inherit;
+}
+.chat-markdown blockquote {
+  border-left: 3px solid oklch(0.65 0.1 250);
+  padding-left: 0.8em;
+  margin: 0.5em 0;
+  color: oklch(0.55 0 0);
+}
+.chat-markdown h1, .chat-markdown h2, .chat-markdown h3, .chat-markdown h4 {
+  font-weight: 600;
+  margin: 0.7em 0 0.3em;
+}
+.chat-markdown h1 { font-size: 1.1em; }
+.chat-markdown h2 { font-size: 1.05em; }
+.chat-markdown h3 { font-size: 1em; }
+
+/* ---------- MDXEditor (éditeur de glossaire WYSIWYG) ---------- */
+.mdxeditor {
+  border: none;
+  background: transparent;
+  font-size: 0.875rem;
+}
+.mdx-toolbar {
+  background: transparent;
+  border-bottom: 1px solid var(--border);
+  border-radius: 0;
+  padding: 0.25rem 0.375rem;
+}
+.mdxeditor .mdx-contenteditable {
+  min-height: 96px;
+  max-height: 176px;
+  overflow-y: auto;
+  padding: 0.5rem 0.75rem;
+  font-size: 0.875rem;
+  line-height: 1.625;
+  outline: none;
+}
+.mdxeditor .mdx-contenteditable [contenteditable="true"]:focus {
+  outline: none;
+}
