@@ -33,6 +33,12 @@ interface Conversation {
   updatedAt: string;
 }
 
+// Detect Persian/Arabic script so bilingual answers render right-to-left
+const PERSIAN_RE = /[\u0600-\u06FF]/;
+function containsPersian(text: string): boolean {
+  return PERSIAN_RE.test(text);
+}
+
 const SUGGESTIONS = [
   "Comment utiliser le plus-que-parfait dans un fait divers ?",
   "Quelle est la différence entre « qui » et « que » ?",
@@ -343,6 +349,7 @@ export function AiChatView() {
                   className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}
                 >
                   <div
+                    dir={msg.role === "user" ? "ltr" : containsPersian(msg.content) ? "rtl" : "ltr"}
                     className={`max-w-[85%] px-3.5 py-2.5 text-sm leading-relaxed ${
                       msg.role === "user"
                         ? "rounded-2xl rounded-br-md bg-primary text-primary-foreground"
@@ -371,9 +378,9 @@ export function AiChatView() {
             </div>
           </ScrollArea>
 
-          {/* Input */}
-          <div className="border-t border-border/50 p-4">
-            <div className="flex gap-2">
+          {/* Input — floating bar */}
+          <div className="p-4 pt-2">
+            <div className="flex gap-2 rounded-2xl border border-border/60 bg-background/95 p-3 shadow-lg shadow-black/5 backdrop-blur-xl supports-[backdrop-filter]:bg-background/80">
               <Textarea
                 ref={textareaRef}
                 value={input}
@@ -381,13 +388,13 @@ export function AiChatView() {
                 onKeyDown={handleKeyDown}
                 placeholder="Votre question…"
                 rows={1}
-                className="min-h-[40px] max-h-[120px] resize-none text-sm"
+                className="min-h-[40px] max-h-[120px] resize-none border-0 bg-transparent text-sm shadow-none focus-visible:ring-0"
               />
               <Button
                 size="icon"
                 onClick={() => send()}
                 disabled={loading || !input.trim()}
-                className="shrink-0"
+                className="shrink-0 self-end rounded-full"
               >
                 <Send className="h-4 w-4" />
               </Button>

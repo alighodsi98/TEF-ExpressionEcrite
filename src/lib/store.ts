@@ -17,6 +17,9 @@ export type ViewId =
   | "practice-section-a"
   | "practice-section-b"
   | "practice-results"
+  | "practice-single"
+  | "practice-single-loading"
+  | "practice-single-results"
   | "external-eval"
   | "external-loading"
   | "external-results"
@@ -37,6 +40,14 @@ export interface TopicB {
   topic: string;
   context: string;
   category: string;
+}
+
+export interface PracticeTopic {
+  section: "A" | "B";
+  topic: string;
+  starterSentence?: string | null;
+  context?: string | null;
+  category?: string | null;
 }
 
 export interface LoadingProgress {
@@ -86,6 +97,9 @@ export interface AppState {
   practiceResult: unknown | null;
   practiceSessionId: string | null;
 
+  // Single-topic practice (started from the topic bank)
+  practiceTopic: PracticeTopic | null;
+
   // Loading progress
   loadingProgress: LoadingProgress | null;
 
@@ -122,6 +136,7 @@ export interface AppState {
   setPracticeDuration: (section: "A" | "B", sec: number) => void;
   setPracticeResult: (r: unknown) => void;
   setPracticeSessionId: (id: string | null) => void;
+  setPracticeTopic: (t: PracticeTopic | null) => void;
   resetPractice: () => void;
 
   setDetailSessionId: (id: string | null) => void;
@@ -148,6 +163,7 @@ export const useApp = create<AppState>((set, get) => ({
   practiceDurationB: 0,
   practiceResult: null,
   practiceSessionId: null,
+  practiceTopic: null,
 
   loadingProgress: null,
 
@@ -232,6 +248,7 @@ export const useApp = create<AppState>((set, get) => ({
     section === "A" ? set({ practiceDurationA: sec }) : set({ practiceDurationB: sec }),
   setPracticeResult: (r) => set({ practiceResult: r }),
   setPracticeSessionId: (id) => set({ practiceSessionId: id }),
+  setPracticeTopic: (t) => set({ practiceTopic: t }),
   resetPractice: () =>
     set({
       practiceSectionA: null,
@@ -242,6 +259,7 @@ export const useApp = create<AppState>((set, get) => ({
       practiceDurationB: 0,
       practiceResult: null,
       practiceSessionId: null,
+      practiceTopic: null,
       loadingProgress: null,
     }),
 

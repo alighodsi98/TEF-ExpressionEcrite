@@ -13,9 +13,10 @@ import { Progress } from "@/components/ui/progress";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
   ArrowLeft, Trash2, BookOpen, Plus, Filter, Search, Pencil, Download, Upload,
-  Volume2, RotateCcw, Ear, ListChecks,
+  Volume2, RotateCcw, Ear, ListChecks, Keyboard,
   CheckCircle2, XCircle, Zap,
 } from "lucide-react";
+import { AccentKeyboard } from "@/components/accent-keyboard";
 import { useApp } from "@/lib/store";
 import { useToast } from "@/hooks/use-toast";
 import { ImportDialog } from "./import-dialog";
@@ -77,8 +78,24 @@ export function GlossaryView() {
   const [ratings, setRatings] = useState<{ again: number; good: number; easy: number }>({ again: 0, good: 0, easy: 0 });
   const [sessionDone, setSessionDone] = useState(false);
   const [ratingSaving, setRatingSaving] = useState(false);
+  const [showKeyboard, setShowKeyboard] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
   const requeueCountRef = useRef<Map<string, number>>(new Map());
+
+  const insertChar = (char: string) => {
+    const ta = textareaRef.current;
+    if (!ta) {
+      setUserAnswer((v) => v + char);
+      return;
+    }
+    const start = ta.selectionStart;
+    const end = ta.selectionEnd;
+    setUserAnswer((v) => v.slice(0, start) + char + v.slice(end));
+    requestAnimationFrame(() => {
+      ta.focus();
+      ta.setSelectionRange(start + char.length, start + char.length);
+    });
+  };
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -174,6 +191,16 @@ export function GlossaryView() {
       setAddPhrase("");
       setAddContext("");
       await load();
+      // If we edited an entry currently in the review queue, update it in place
+      if (isEdit && reviewMode) {
+        setQueue((prev) =>
+          prev.map((e) =>
+            e.id === editingId
+              ? { ...e, section: addSection, phrase: addPhrase.trim(), context: addContext.trim() || null }
+              : e
+          )
+        );
+      }
       // Restore scroll position after dialog closes and data reloads
       if (isEdit) {
         setTimeout(() => window.scrollTo(0, scrollPosition), 0);
@@ -333,8 +360,8 @@ export function GlossaryView() {
         else if (e.key === "2") void handleRate("good");
         else if (e.key === "3") void handleRate("easy");
       }
-      // Replay the voice with Ctrl+E while the answer is not yet checked
-      if (!checked && (e.ctrlKey || e.metaKey) && (e.key === "e" || e.key === "E")) {
+      // Replay the voice with Alt+E while the answer is not yet checked
+      if (!checked && e.altKey && !e.ctrlKey && !e.metaKey && (e.key === "e" || e.key === "E")) {
         e.preventDefault();
         playCurrent();
       }
@@ -483,9 +510,21 @@ export function GlossaryView() {
                   <Badge variant={entry.section === "A" ? "secondary" : "outline"}>
                     {entry.section === "A" ? "Section A" : "Section B"}
                   </Badge>
-                  <span className="text-xs text-muted-foreground">
-                    Révision n°{entry.reviewCount + 1}
-                  </span>
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs text-muted-foreground">
+                      Révision n°{entry.reviewCount + 1}
+                    </span>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-7 w-7"
+                      aria-label="Modifier cette entrée"
+                      title="Modifier cette entrée"
+                      onClick={() => openEditDialog(entry)}
+                    >
+                      <Pencil className="h-3.5 w-3.5" />
+                    </Button>
+                  </div>
                 </div>
 
                 <div className="flex flex-wrap items-center justify-center gap-2">
@@ -533,7 +572,7 @@ export function GlossaryView() {
                   <>
                     <Textarea
                       ref={textareaRef}
-                      placeholder="Écrivez ce que vous entendez... (Entrée pour vérifier)"
+                      placeholder="Écrivez ce que vous entendez... (Entrée pour vérifier · Alt+E pour réécouter)"
                       value={userAnswer}
                       onChange={(e) => setUserAnswer(e.target.value)}
                       disabled={checked}
@@ -557,7 +596,24 @@ export function GlossaryView() {
                       >
                         <CheckCircle2 className="h-4 w-4" /> Vérifier
                       </Button>
+                      <Button
+                        type="button"
+                        variant={showKeyboard ? "secondary" : "outline"}
+                        size="lg"
+                        onClick={() => setShowKeyboard((v) => !v)}
+                        className="gap-1.5"
+                        title="Afficher/masquer le clavier des accents"
+                      >
+                        <Keyboard className="h-4 w-4" />
+                        <span className="hidden sm:inline">Accents</span>
+                      </Button>
                     </div>
+                    {showKeyboard && (
+                      <AccentKeyboard
+                        onInsert={insertChar}
+                        className="tef-slide-down rounded-xl border border-border/60 bg-muted/30 p-2"
+                      />
+                    )}
                     <p className="text-center text-xs text-muted-foreground">
                       Entrée vide ? « Vérifier » affichera la correction (avec votre note).
                     </p>
@@ -619,56 +675,58 @@ export function GlossaryView() {
         </div>
       ) : (
         <>
-          <div className="flex flex-wrap items-center gap-2">
-            <Filter className="h-4 w-4 text-muted-foreground" />
-            <Button
-              variant={filterSection === "all" ? "default" : "outline"}
-              size="sm"
-              onClick={() => setFilterSection("all")}
-            >
-              Tout
-            </Button>
-            <Button
-              variant={filterSection === "A" ? "default" : "outline"}
-              size="sm"
-              onClick={() => setFilterSection("A")}
-            >
-              Section A
-            </Button>
-            <Button
-              variant={filterSection === "B" ? "default" : "outline"}
-              size="sm"
-              onClick={() => setFilterSection("B")}
-            >
-              Section B
-            </Button>
-            <div className="flex-1" />
-            <Button
-              variant="ghost"
-              size="sm"
-              className="gap-1.5 text-xs"
-              onClick={() => handleExport("csv")}
-            >
-              <Download className="h-3.5 w-3.5" /> CSV
-            </Button>
-            <Button
-              variant="ghost"
-              size="sm"
-              className="gap-1.5 text-xs"
-              onClick={() => handleExport("txt")}
-            >
-              <Download className="h-3.5 w-3.5" /> TXT
-            </Button>
-          </div>
+          <div className="sticky top-14 z-30 -mx-4 space-y-2 bg-background/95 px-4 py-2 backdrop-blur-xl supports-[backdrop-filter]:bg-background/80 sm:top-16">
+            <div className="flex flex-wrap items-center gap-2">
+              <Filter className="h-4 w-4 text-muted-foreground" />
+              <Button
+                variant={filterSection === "all" ? "default" : "outline"}
+                size="sm"
+                onClick={() => setFilterSection("all")}
+              >
+                Tout
+              </Button>
+              <Button
+                variant={filterSection === "A" ? "default" : "outline"}
+                size="sm"
+                onClick={() => setFilterSection("A")}
+              >
+                Section A
+              </Button>
+              <Button
+                variant={filterSection === "B" ? "default" : "outline"}
+                size="sm"
+                onClick={() => setFilterSection("B")}
+              >
+                Section B
+              </Button>
+              <div className="flex-1" />
+              <Button
+                variant="ghost"
+                size="sm"
+                className="gap-1.5 text-xs"
+                onClick={() => handleExport("csv")}
+              >
+                <Download className="h-3.5 w-3.5" /> CSV
+              </Button>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="gap-1.5 text-xs"
+                onClick={() => handleExport("txt")}
+              >
+                <Download className="h-3.5 w-3.5" /> TXT
+              </Button>
+            </div>
 
-          <div className="relative w-full">
-            <Search className="absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground" />
-            <Input
-              placeholder="Rechercher..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="h-9 w-full pl-8 text-sm"
-            />
+            <div className="relative w-full">
+              <Search className="absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground" />
+              <Input
+                placeholder="Rechercher..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="h-9 w-full pl-8 text-sm"
+              />
+            </div>
           </div>
 
           {loading ? (

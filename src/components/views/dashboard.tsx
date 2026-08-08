@@ -162,7 +162,6 @@ export function DashboardView() {
           label="Séances"
           value={totals?.sessions ?? 0}
           icon={<Calendar className="h-4 w-4" />}
-          trend={scoreTrend != null ? (scoreTrend > 0 ? "up" : scoreTrend < 0 ? "down" : null) : null}
         />
         <StatCard
           label="Score moyen"

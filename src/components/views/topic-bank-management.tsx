@@ -9,7 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { ArrowLeft, Plus, Pencil, Trash2, X, Save, GripVertical, Search, Upload } from "lucide-react";
+import { ArrowLeft, Plus, Pencil, Trash2, X, Save, GripVertical, Search, Upload, Play } from "lucide-react";
 import { useApp } from "@/lib/store";
 import { useToast } from "@/hooks/use-toast";
 import { ImportDialog } from "./import-dialog";
@@ -45,6 +45,7 @@ interface TopicItem {
 
 export function TopicBankManagementView() {
   const setView = useApp((s) => s.setView);
+  const setPracticeTopic = useApp((s) => s.setPracticeTopic);
   const { toast } = useToast();
   const [topics, setTopics] = useState<TopicItem[]>([]);
   const [loading, setLoading] = useState(true);
@@ -163,6 +164,17 @@ export function TopicBankManagementView() {
     setTopics(reordered);
   }
 
+  function startPractice(t: TopicItem) {
+    setPracticeTopic({
+      section: t.section as "A" | "B",
+      topic: t.topic,
+      starterSentence: t.starterSentence,
+      context: t.context,
+      category: t.category,
+    });
+    setView("practice-single");
+  }
+
   const categories = [
     ...new Set(topics.map((t) => t.category).filter(Boolean) as string[]),
   ].sort();
@@ -200,37 +212,39 @@ export function TopicBankManagementView() {
         </div>
       </div>
 
-      <div className="flex flex-wrap items-center gap-2">
-        <Button
-          variant={activeSection === "A" ? "default" : "outline"}
-          size="sm"
-          onClick={() => setActiveSection("A")}
-        >
-          Section A — Fait divers
-        </Button>
-        <Button
-          variant={activeSection === "B" ? "default" : "outline"}
-          size="sm"
-          onClick={() => setActiveSection("B")}
-        >
-          Section B — Lettre
-        </Button>
-        <div className="flex-1" />
-        {totalCount > 0 && (
-          <span className="text-[11px] text-muted-foreground">
-            {writtenCount}/{totalCount} écrits
-          </span>
-        )}
-      </div>
+      <div className="sticky top-14 z-30 -mx-4 space-y-2 bg-background/95 px-4 py-2 backdrop-blur-xl supports-[backdrop-filter]:bg-background/80 sm:top-16">
+        <div className="flex flex-wrap items-center gap-2">
+          <Button
+            variant={activeSection === "A" ? "default" : "outline"}
+            size="sm"
+            onClick={() => setActiveSection("A")}
+          >
+            Section A — Fait divers
+          </Button>
+          <Button
+            variant={activeSection === "B" ? "default" : "outline"}
+            size="sm"
+            onClick={() => setActiveSection("B")}
+          >
+            Section B — Lettre
+          </Button>
+          <div className="flex-1" />
+          {totalCount > 0 && (
+            <span className="text-[11px] text-muted-foreground">
+              {writtenCount}/{totalCount} écrits
+            </span>
+          )}
+        </div>
 
-      <div className="relative w-full">
-        <Search className="absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground" />
-        <Input
-          placeholder="Rechercher un sujet..."
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          className="h-8 pl-8 text-xs"
-        />
+        <div className="relative w-full">
+          <Search className="absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground" />
+          <Input
+            placeholder="Rechercher un sujet..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="h-8 pl-8 text-xs"
+          />
+        </div>
       </div>
 
       {loading ? (
@@ -261,7 +275,7 @@ export function TopicBankManagementView() {
                   );
                 })
                 .map((t) => (
-                  <SortableTopic key={t.id} topic={t} onEdit={openEditDialog} onDelete={setDeleteId} />
+                  <SortableTopic key={t.id} topic={t} onEdit={openEditDialog} onDelete={setDeleteId} onPractice={startPractice} />
                 ))}
             </div>
           </SortableContext>
@@ -359,7 +373,7 @@ export function TopicBankManagementView() {
   );
 }
 
-function SortableTopic({ topic, onEdit, onDelete }: { topic: TopicItem; onEdit: (t: TopicItem) => void; onDelete: (id: string) => void }) {
+function SortableTopic({ topic, onEdit, onDelete, onPractice }: { topic: TopicItem; onEdit: (t: TopicItem) => void; onDelete: (id: string) => void; onPractice: (t: TopicItem) => void }) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: topic.id });
   const style = {
     transform: CSS.Transform.toString(transform),
@@ -392,6 +406,17 @@ function SortableTopic({ topic, onEdit, onDelete }: { topic: TopicItem; onEdit: 
         </div>
       </div>
       <div className="flex shrink-0 items-center gap-0.5">
+        <Button
+          variant="ghost"
+          size="sm"
+          className="h-8 gap-1 px-2 text-primary hover:text-primary"
+          aria-label="S'entraîner sur ce sujet"
+          title="S'entraîner sur ce sujet"
+          onClick={() => onPractice(topic)}
+        >
+          <Play className="h-3.5 w-3.5" />
+          <span className="text-xs">S&apos;entraîner</span>
+        </Button>
         <Button variant="ghost" size="icon" className="h-8 w-8" aria-label="Modifier" onClick={() => onEdit(topic)}>
           <Pencil className="h-3.5 w-3.5" />
         </Button>

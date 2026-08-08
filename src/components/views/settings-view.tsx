@@ -27,10 +27,12 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { cn } from "@/lib/utils";
 import {
-  Save, ArrowLeft, KeyRound, Cpu, Lightbulb, DatabaseBackup,
+  Save, ArrowLeft, KeyRound, Cpu, Lightbulb, DatabaseBackup, Palette,
   Plus, Pencil, Trash2, Check, Download, Upload, Volume2, Play,
 } from "lucide-react";
 import { getFrVoices, getPreferredVoiceName, setPreferredVoiceName, speakFrench } from "@/lib/speech";
+import { ACCENTS, ACCENT_KEYS, isAccentKey, type AccentKey } from "@/lib/accent";
+import { useAccent } from "@/components/accent-provider";
 
 interface AiModel {
   id: string;
@@ -49,12 +51,14 @@ const CATEGORY_ORDER = ["paid", "free", "custom"];
 export function SettingsView() {
   const setView = useApp((s) => s.setView);
   const { toast } = useToast();
+  const { setAccent } = useAccent();
 
   const [apiKey, setApiKey] = useState("");
   const [baseUrl, setBaseUrl] = useState("");
   const [model, setModel] = useState("google/gemini-2.5-flash");
   const [models, setModels] = useState<AiModel[]>([]);
   const [smartMissionsEnabled, setSmartMissionsEnabled] = useState(true);
+  const [accentColor, setAccentColor] = useState<AccentKey>("emerald");
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
 
@@ -124,6 +128,7 @@ export function SettingsView() {
         setBaseUrl(settings.aiBaseUrl || "");
         setModel(settings.aiModel || "google/gemini-2.5-flash");
         setSmartMissionsEnabled(settings.smartMissionsEnabled !== false);
+        if (isAccentKey(settings.accentColor)) setAccentColor(settings.accentColor);
         setModels(modelsData.models || []);
       } catch {
         // ignore
@@ -226,9 +231,11 @@ export function SettingsView() {
       const res = await fetch("/api/settings", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ aiApiKey: apiKey.trim(), aiModel: model, aiBaseUrl: baseUrl.trim(), smartMissionsEnabled }),
+        body: JSON.stringify({ aiApiKey: apiKey.trim(), aiModel: model, aiBaseUrl: baseUrl.trim(), smartMissionsEnabled, accentColor }),
       });
       if (!res.ok) throw new Error("Save failed");
+      // Apply the accent immediately so the change is visible without reload.
+      setAccent(accentColor);
       toast({ title: "Enregistré", description: "Les paramètres IA ont été enregistrés avec succès." });
     } catch {
       toast({ title: "Erreur", description: "Échec de l'enregistrement des paramètres.", variant: "destructive" });
@@ -678,6 +685,50 @@ export function SettingsView() {
                 : "La préférence est enregistrée automatiquement et s'applique à toutes les lectures (corrections, glossaire, sélection de texte)."}
             </p>
           </div>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2 text-sm font-semibold">
+            <Palette className="h-4 w-4" />
+            Couleur d&apos;accent
+          </CardTitle>
+          <CardDescription>
+            Choisissez la couleur principale de l&apos;application (boutons, liens, sélections). Enregistrée avec les paramètres.
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="flex flex-wrap items-center gap-2">
+            {ACCENT_KEYS.map((key) => {
+              const a = ACCENTS[key];
+              const active = accentColor === key;
+              return (
+                <button
+                  key={key}
+                  type="button"
+                  onClick={() => setAccentColor(key)}
+                  className={cn(
+                    "flex items-center gap-2 rounded-full border px-3 py-1.5 text-sm transition-all",
+                    active
+                      ? "border-primary/40 bg-primary/10 font-medium"
+                      : "border-border/60 hover:border-primary/30"
+                  )}
+                  aria-pressed={active}
+                >
+                  <span
+                    className="h-4 w-4 rounded-full ring-1 ring-black/10"
+                    style={{ backgroundColor: a.swatch }}
+                  />
+                  {a.label}
+                  {active && <Check className="h-3.5 w-3.5" />}
+                </button>
+              );
+            })}
+          </div>
+          <p className="mt-2 text-xs text-muted-foreground/70">
+            La couleur s&apos;applique après avoir cliqué sur « Enregistrer ».
+          </p>
         </CardContent>
       </Card>
 

@@ -264,7 +264,7 @@
 .chat-markdown p { margin: 0.5em 0; line-height: 1.65; }
 .chat-markdown p:first-child { margin-top: 0; }
 .chat-markdown p:last-child { margin-bottom: 0; }
-.chat-markdown ul, .chat-markdown ol { margin: 0.5em 0; padding-left: 1.4em; }
+.chat-markdown ul, .chat-markdown ol { margin: 0.5em 0; padding-inline-start: 1.4em; }
 .chat-markdown li { margin: 0.2em 0; }
 .chat-markdown strong { font-weight: 600; }
 .chat-markdown em { font-style: italic; }
@@ -294,8 +294,8 @@
   font-size: inherit;
 }
 .chat-markdown blockquote {
-  border-left: 3px solid oklch(0.65 0.1 250);
-  padding-left: 0.8em;
+  border-inline-start: 3px solid oklch(0.65 0.1 250);
+  padding-inline-start: 0.8em;
   margin: 0.5em 0;
   color: oklch(0.55 0 0);
 }

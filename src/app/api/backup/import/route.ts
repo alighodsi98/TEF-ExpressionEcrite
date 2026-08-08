@@ -122,6 +122,7 @@ export async function POST(req: NextRequest) {
               aiBaseUrl: asString(up.aiBaseUrl) ?? user.aiBaseUrl,
               smartMissionsEnabled:
                 typeof up.smartMissionsEnabled === "boolean" ? up.smartMissionsEnabled : user.smartMissionsEnabled,
+              accentColor: asString(up.accentColor) ?? user.accentColor,
             },
           });
           counts.settings = 1;

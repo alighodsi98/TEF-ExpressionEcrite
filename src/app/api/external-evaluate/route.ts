@@ -2,6 +2,7 @@ import { NextRequest } from "next/server";
 import { db } from "@/lib/db";
 import { correctExercise, type CorrectionResult } from "@/lib/ai";
 import { getOrCreateCurrentUser, countWords } from "@/lib/user";
+import { markTopicWritten } from "@/lib/topic-bank";
 
 const STEP_LABELS: Record<string, string> = {
   "realistic": "Évaluation — Réaliste",
@@ -48,6 +49,9 @@ export async function POST(req: NextRequest) {
           context: section === "B" ? context : undefined,
           userText,
         });
+
+        // If the topic comes from the bank, mark it as written
+        await markTopicWritten(section, topic);
 
         completed++;
         send({ type: "done_step", key: "realistic", completed, total: totalSteps, label: STEP_LABELS["realistic"] });

@@ -15,6 +15,8 @@ import { PracticeIntroView } from "@/components/views/practice-intro";
 import { PracticeSectionAView } from "@/components/views/practice-section-a";
 import { PracticeSectionBView } from "@/components/views/practice-section-b";
 import { PracticeResultsView } from "@/components/views/practice-results";
+import { PracticeSingleView } from "@/components/views/practice-single";
+import { PracticeSingleResultsView } from "@/components/views/practice-single-results";
 import { ExternalEvalView } from "@/components/views/external-eval";
 import { ExternalResultsView } from "@/components/views/external-results";
 import { HistoryView } from "@/components/views/history";
@@ -51,7 +53,7 @@ export default function Home() {
   }, [hydrated, setView, setHydrated, checkHealth]);
 
   // Determine whether to show header (hide during placement/practice writing for focus)
-  const writingViews = ["placement-section-a", "placement-section-b", "practice-section-a", "practice-section-b", "placement-loading", "practice-loading", "external-loading"];
+  const writingViews = ["placement-section-a", "placement-section-b", "practice-section-a", "practice-section-b", "practice-single", "placement-loading", "practice-loading", "practice-single-loading", "external-loading"];
   const showHeader = !writingViews.includes(view);
   const isWriting = writingViews.includes(view);
 
@@ -83,6 +85,11 @@ export default function Home() {
               <LoadingView key="practice-loading" title="Correction de l'exercice…" onCancel={() => setView("practice-section-b")} />
             )}
             {view === "practice-results" && <PracticeResultsView key="practice-results" />}
+            {view === "practice-single" && <PracticeSingleView key="practice-single" />}
+            {view === "practice-single-loading" && (
+              <LoadingView key="practice-single-loading" title="Correction de l'entraînement…" onCancel={() => setView("practice-single")} />
+            )}
+            {view === "practice-single-results" && <PracticeSingleResultsView key="practice-single-results" />}
             {view === "external-eval" && <ExternalEvalView key="external-eval" />}
             {view === "external-loading" && (
               <LoadingView key="external-loading" title="Évaluation en cours…" onCancel={() => setView("external-eval")} />
