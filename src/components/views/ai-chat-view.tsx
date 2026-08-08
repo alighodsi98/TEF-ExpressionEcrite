@@ -3,7 +3,7 @@
 import { useState, useRef, useEffect, useCallback } from "react";
 import {
   MessageCircle,
-  Send,
+  ArrowUp,
   Loader2,
   Trash2,
   Plus,
@@ -396,7 +396,7 @@ export function AiChatView() {
                 disabled={loading || !input.trim()}
                 className="shrink-0 self-end rounded-full"
               >
-                <Send className="h-4 w-4" />
+                <ArrowUp className="h-4 w-4" />
               </Button>
             </div>
           </div>

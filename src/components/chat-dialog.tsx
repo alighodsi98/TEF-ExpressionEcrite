@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect, useCallback } from "react";
-import { MessageCircle, Send, Loader2, Trash2 } from "lucide-react";
+import { MessageCircle, ArrowUp, Loader2, Trash2 } from "lucide-react";
 import { Markdown } from "@/components/markdown-components";
 import {
   Dialog,
@@ -176,7 +176,7 @@ export function ChatDialog() {
               disabled={loading || !input.trim()}
               className="shrink-0"
             >
-              <Send className="h-4 w-4" />
+              <ArrowUp className="h-4 w-4" />
             </Button>
           </div>
           {messages.length > 0 && (
