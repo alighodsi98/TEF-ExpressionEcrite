@@ -425,7 +425,7 @@ export function GlossaryView() {
             <h2 className="text-xl font-bold tracking-tight flex items-center gap-2">
               <BookOpen className="h-5 w-5 text-primary" /> Glossaire personnel
             </h2>
-            <p className="text-sm text-muted-foreground">Mots et expressions sauvegardés depuis les réécritures C1</p>
+            <p className="text-sm text-muted-foreground">Mots et expressions sauvegardés</p>
           </div>
         </div>
       </div>
@@ -814,7 +814,7 @@ export function GlossaryView() {
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="A">Section A — Fait divers</SelectItem>
-                  <SelectItem value="B">Section B — Lettre</SelectItem>
+                  <SelectItem value="B">Section B — Argumentation</SelectItem>
                 </SelectContent>
               </Select>
             </div>

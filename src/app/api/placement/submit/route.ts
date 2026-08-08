@@ -93,6 +93,20 @@ export async function POST(req: NextRequest) {
         const corrA = corrBySection.A;
         const corrB = corrBySection.B;
 
+        // If one section failed, fall back to the successful section's level
+        // instead of defaulting to NCLC 1 (which would wrongly show A1).
+        if (corrA.nclcLevel === "—" && corrB.nclcLevel !== "—") {
+          corrA.nclcLevel = corrB.nclcLevel;
+          corrA.cecrLevel = corrB.cecrLevel;
+          corrA.scores = { ...corrB.scores };
+          corrA.globalScore = corrB.globalScore;
+        } else if (corrB.nclcLevel === "—" && corrA.nclcLevel !== "—") {
+          corrB.nclcLevel = corrA.nclcLevel;
+          corrB.cecrLevel = corrA.cecrLevel;
+          corrB.scores = { ...corrA.scores };
+          corrB.globalScore = corrA.globalScore;
+        }
+
         // Phase 2: Placement evaluation
         send({ type: "progress", completed, total: totalSteps, current: STEP_LABELS["placement"] });
         const placement = await evaluatePlacement({ sectionA: corrA, sectionB: corrB });

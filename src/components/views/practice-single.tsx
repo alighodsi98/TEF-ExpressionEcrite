@@ -119,7 +119,7 @@ export function PracticeSingleView() {
       onCancel={handleCancel}
       submitLabel={submitting ? "Correction…" : "Valider et corriger"}
       submitLoading={submitting}
-      heading={isSectionA ? "Section A — Fait divers" : "Section B — Lettre"}
+      heading={isSectionA ? "Section A — Fait divers" : "Section B — Argumentation"}
       instructions={
         isSectionA
           ? [
@@ -128,8 +128,8 @@ export function PracticeSingleView() {
               "Minimum 80 mots. Temps : 25 minutes.",
             ]
           : [
-              "Rédigez une lettre au rédacteur en chef en défendant votre position.",
-              "Structurez votre lettre : formule d'appel, arguments, conclusion.",
+              "Exprimez et justifiez votre point de vue sur le sujet proposé.",
+              "Structurez votre argumentation : introduction, arguments, conclusion.",
               "Minimum 200 mots. Temps : 35 minutes.",
             ]
       }

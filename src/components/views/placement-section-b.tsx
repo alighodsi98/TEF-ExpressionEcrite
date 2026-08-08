@@ -106,9 +106,9 @@ export function PlacementSectionBView() {
       onCancel={() => { resetPlacement(); setView("dashboard"); }}
       submitLabel={submitting ? "Correction…" : "Valider et corriger"}
       submitLoading={submitting}
-      heading="Section B — Lettre au rédacteur"
+      heading="Section B — Argumentation"
       instructions={[
-        "Lettre formelle en 4-5 paragraphes : introduction, trois arguments (chacun avec exemple/étude/preuve), conclusion.",
+        "Exprimez et justifiez votre point de vue : introduction, arguments (chacun avec exemple/étude/preuve), conclusion.",
         "Utilisez un vocabulaire riche, des structures avancées et des connecteurs logiques.",
         "Minimum 200 mots. Temps : 35 minutes.",
       ]}

@@ -31,7 +31,7 @@ export function ExternalResultsView() {
   }
 
   const currentCorrection = result.corrections.realistic;
-  const sectionLabel = result.section === "A" ? "Fait divers" : "Lettre";
+  const sectionLabel = result.section === "A" ? "Fait divers" : "Argumentation";
 
   return (
     <div className="tef-fade-up mx-auto max-w-4xl space-y-4 pb-6">

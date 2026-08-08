@@ -42,7 +42,7 @@ export function PracticeIntroView() {
       <div className="text-center">
         <h2 className="text-2xl font-bold tracking-tight sm:text-3xl">Nouvelle séance d&apos;entraînement</h2>
         <p className="mx-auto mt-2 max-w-2xl text-sm leading-relaxed text-muted-foreground">
-          Comme lors de l&apos;examen : fait divers (25 min) et lettre au rédacteur (35 min).
+          Comme lors de l&apos;examen : fait divers (25 min) et argumentation (35 min).
           Après la rédaction, vous recevrez une correction selon le mode <strong>réaliste</strong> (grille officielle TEF Canada).
         </p>
       </div>

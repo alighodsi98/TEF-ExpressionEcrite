@@ -283,7 +283,7 @@ export function ImportDialog({ open, onOpenChange, mode, section = "A", onImport
               )}
               {mode === "topics" && (
                 <span className="text-xs text-muted-foreground">
-                  Section {section === "A" ? "A — Fait divers" : "B — Lettre"}
+                  Section {section === "A" ? "A — Fait divers" : "B — Argumentation"}
                 </span>
               )}
             </div>

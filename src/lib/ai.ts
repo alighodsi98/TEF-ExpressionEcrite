@@ -1,4 +1,5 @@
 import { db } from "@/lib/db";
+import { countWords } from "@/lib/user";
 
 // ---------------------------------------------------------------------------
 // OpenAI-compatible LLM client (reads config from database)
@@ -114,7 +115,7 @@ async function fetchLLM(
         "Content-Type": "application/json",
         Authorization: `Bearer ${apiKey}`,
       },
-      body: JSON.stringify({ model, messages, stream: false }),
+      body: JSON.stringify({ model, messages, stream: false, temperature: 0, max_tokens: 8192 }),
       signal: controller.signal,
     });
 
@@ -618,11 +619,12 @@ You are an expert TEF Canada Expression Écrite examiner. You produce original e
 - Pick a varied, original topic (avoid clichés). Provide a realistic but slightly surprising starter sentence in French.`);
   }
   if (!opts.sectionAOnly) {
-    parts.push(`SECTION B (lettre argumentative / argumentative letter to the editor):
-- The candidate writes a formal letter to a newspaper editor (min 200 words, 35 min), 4-5 paragraphs: intro, 3 arguments (pro or con) each with a concrete example / study / evidence, conclusion.
+    parts.push(`SECTION B (argumentation / point de vue justifié):
+- The candidate must express and justify a point of view on a debatable statement (min 200 words, 35 min): agree or disagree, with 3 arguments (pro or con) each supported by a concrete example / study / evidence, plus a conclusion.
+- IMPORTANT: the letter format is NOT required. The official TEF Canada instructions say the argumentation does NOT have to be written as a letter ("il n'est pas du tout obligatoire de rédiger son argumentation sous forme de lettre"). Do NOT impose a letter format, letterhead, or "letter to the editor" framing.
 - Choose a debatable topic in education, health, politics, society, family, sports or environment.
-- Register: formal, persuasive, respectful tone appropriate for a letter to a newspaper editor.
-- Provide a clear situational context (who writes, to whom, about what controversy).${opts.category ? ` The category MUST be: ${opts.category}.` : ""}`);
+- Register: clear, structured, persuasive but measured; appropriate for a formal written argumentation (not necessarily a letter).
+- Provide a clear situational context: a statement or opinion the candidate must react to (e.g. an article, an editorial, a public debate).${opts.category ? ` The category MUST be: ${opts.category}.` : ""}`);
   }
 
   parts.push(`<<<JSON>>>
@@ -653,7 +655,7 @@ export async function correctExercise(params: {
   const sectionDesc =
     section === "A"
       ? `SECTION A — Fait divers (news story). The candidate continued a starter sentence into a news report (min 80 words). Expected: past tenses (imparfait, passé composé, plus-que-parfait), conditionnel, voix passive, discours indirect, news vocabulary, time connectors. Register: journalistic, objective, informative tone.`
-      : `SECTION B — Lettre argumentative (argumentative letter to the editor). Min 200 words, 4-5 paragraphs: introduction, 3 arguments (each with a concrete example / study / evidence), conclusion. Expected: rich vocabulary, advanced grammar, structured argumentation. Register: formal, persuasive, respectful tone appropriate for a letter to a newspaper editor.`;
+      : `SECTION B — Argumentation (point de vue justifié). The candidate must express and justify a point of view on a debatable statement (min 200 words): agree or disagree, with arguments each supported by concrete examples / evidence, and a conclusion. IMPORTANT: the letter format is NOT required — the official TEF Canada instructions state the argumentation does NOT have to be written as a letter ("il n'est pas du tout obligatoire de rédiger son argumentation sous forme de lettre"). Do NOT penalize a candidate for not using a letter format, letterhead, or "letter to the editor" framing. Register: clear, structured, persuasive but measured.`;
 
   const system = `CRITICAL FORMAT RULE: Your ENTIRE response must be EXACTLY one JSON object. Start your response with <<<JSON>>> then the JSON then >>>. No text, no markdown fences, no commentary, no explanation before or after. Failure to follow this format will cause an error.
 
@@ -662,11 +664,11 @@ You are a senior TEF Canada Expression Écrite examiner and French language coac
 MODE ÉVALUATION : RÉALISTE (grille officielle). Appliquez fidèlement la grille officielle TEF Canada (4 critères officiels). Listez TOUTES les erreurs du candidat de manière EXHAUSTIVE — ne manquez aucune faute. Soyez minutieux et complet dans l'identification des erreurs (niveau 1).
 
 TEF CANADA — EXPRESSION ÉCRITE : grille officielle d'évaluation
-The TEF Canada written expression is graded on exactly FOUR official areas (CCIP / Chambre de Commerce grid; each area 0-45 points). Score each area HONESTLY on the 0-45 scale:
-  1. ADÉQUATION À LA CONSIGNE (0-45) — respect des consignes (longueur, genre textuel, registre journalistique/formel).
-  2. COHÉRENCE ET COHÉSION (0-45) — structure, enchaînement logique, connecteurs, progression des idées.
-  3. MAÎTRISE DU VOCABULAIRE (0-45) — richesse lexicale, précision, orthographe, ponctuation, registre.
-  4. MAÎTRISE DE LA GRAMMAIRE (0-45) — syntaxe, temps, modes, conjugaison, accords.
+The TEF Canada written expression is graded on exactly FOUR official areas (CCIP / Chambre de Commerce et d'Industrie de Paris grid; each area 0-45 points). Score each area HONESTLY on the 0-45 scale:
+  1. PERTINENCE DES INFORMATIONS TRANSMISES (0-45) — adéquation avec le sujet : respect des consignes (longueur, genre textuel, registre), informations nouvelles et pertinentes par rapport au sujet.
+  2. QUALITÉ DES INFORMATIONS / DES ARGUMENTS (0-45) — développement, détails, illustrations, exemples concrets (Section A : qualité des informations ; Section B : qualité des arguments).
+  3. COHÉRENCE INTERNE, COHÉSION DU TEXTE ET DE LA PHRASE, QUALITÉ DES PHRASES ET DU VOCABULAIRE (0-45) — structure, enchaînement logique, connecteurs, progression des idées, variété, correction, précision et adéquation du vocabulaire avec le sujet.
+  4. ORTHOGRAPHE ET PONCTUATION (0-45) — maîtrise de l'orthographe lexicale et grammaticale, de la ponctuation, et de la grammaire (syntaxe, temps, modes, conjugaison, accords).
 
 SCORING ANCHORS — USE THESE CONCRETE EXAMPLES TO CALIBRATE:
 
@@ -686,21 +688,50 @@ Score 38-45/45 (excellent — near-native mastery):
   Example text: "Un employé d'un centre commercial du quatrième arrondissement de Paris a sauvé la vie de plusieurs personnes lors d'un incendie déclaré hier matin. Un ancien pompier, présent sur les lieux, a immédiatement entrepris l'évacuation des clients pris au piège, tandis que les sapeurs-pompiers, alertés par le système d'alarme, se rendaient sur place. Après une heure d'intervention, les flammes ont été maîtrisées. Les blessés, dont certains dans un état critique, ont été transportés vers les hôpitaux avoisinants. La Préfecture de Police a ouvert une enquête pour déterminer les causes de l'incendie."
   → Rich vocabulary (déclaré, pris au piège, maîtrisées, avoisinants), complex syntax (tandis que, dont), passive voice, precise register, 0-1 minor errors.
 
+SECTION B ANCHORS (argumentation — use these to calibrate Section B scores):
+
+Score 10-15/45 (faible — frequent errors, limited mastery):
+  Example text: "Je suis d'accord avec vous. Le tabac est dangereux. Il faut l'interdire. Beaucoup de gens sont malade. Les jeunes commence à fumer trop tôt. C'est pas bien."
+  → Simple sentences, no connectors, no developed arguments, basic vocabulary, several errors, no structure.
+
+Score 20-25/45 (moyen — some strengths but significant weaknesses):
+  Example text: "Je suis d'accord avec l'article. Le tabac est très dangereux pour la santé. Il faut l'interdire parce que beaucoup de personnes meurent chaque année. Les jeunes commencent à fumer de plus en plus tôt. Le gouvernement devrait prendre des mesures. Par exemple, il pourrait augmenter les prix."
+  → Clear opinion, some arguments, basic connectors (parce que, par exemple), adequate vocabulary but limited variety, 3-5 errors, no complex grammar.
+
+Score 30-35/45 (bon — competent with minor weaknesses):
+  Example text: "Je partage entièrement l'opinion exprimée dans votre article : le tabac représente un danger majeur pour la santé publique. En effet, selon l'Organisation mondiale de la santé, le tabagisme provoque plusieurs millions de décès chaque année dans le monde. De plus, la prévention auprès des jeunes reste insuffisante, malgré les campagnes de sensibilisation. Il me semble donc indispensable de renforcer les mesures d'interdiction, tout en développant l'accompagnement des fumeurs souhaitant arrêter."
+  → Good structure, appropriate connectors (en effet, de plus, donc), developed arguments with evidence, varied vocabulary, 1-2 minor errors.
+
+Score 38-45/45 (excellent — near-native mastery):
+  Example text: "L'article paru dans votre journal soulève une question essentielle : celle de la place du tabac dans notre société. Si je partage le constat alarmant des dangers du tabagisme, je pense toutefois qu'une interdiction pure et simple ne saurait suffire. En effet, l'expérience de nombreux pays montre que la répression, sans politique d'accompagnement, conduit souvent à un marché parallèle. Il conviendrait plutôt de combiner prévention précoce, soutien au sevrage et taxation progressive, comme l'ont démontré les études menées au Canada. C'est à cette condition que nous pourrons réellement réduire le tabagisme, sans laisser personne de côté."
+  → Rich vocabulary (constat, sevrage, taxation progressive), complex syntax (si... je pense que, sans politique d'accompagnement), nuanced argumentation, precise register, 0-1 minor errors.
+
 CRITICAL CALIBRATION RULES:
 - A text with 5+ errors is typically NCLC 5-6 at best.
 - A text with 3-4 errors is typically NCLC 6-7 at best.
 - A text with no complex syntax (no subordinate clauses, no passive voice, no conditional) is typically NCLC 5-6 at best.
 - A text using only basic connectors (et, mais, ensuite) is typically NCLC 5-6 at best.
 - A text with informal register in a formal task is typically NCLC 5-6 at best.
-- When in doubt, score LOWER. Most candidates are intermediate (NCLC 5-7). Very few achieve NCLC 9+.
+- Be fair and precise: score based on the actual text quality against the anchors above. Avoid systematic leniency or harshness.
 
-CRITICAL: Assign nclcLevel (1-12) and cecrLevel (A1-C2) based on the4 scores. The4 scores are 0-45 each.`;
+OFFICIAL EXAM RULES (CCIP — apply these when scoring):
+- Section A: "Ne recopiez pas le début du texte, cela ne vous fait pas gagner de point. Ne résumez pas et ne reformulez pas le texte. Apportez des informations nouvelles, en faisant appel à votre imagination." If the candidate merely paraphrases the starter sentence or repeats it at length, deduct from "pertinence/qualité des informations" (criteria 1 and 2).
+- Section B: "Inutile de rédiger sous forme de lettre formelle, avec un en-tête officiel : ça ne rapporte aucun point." The letter format is NOT required and earns no points — do NOT penalize its absence and do NOT reward its presence.
+- Section B: "Évitez absolument les longues introductions et conclusions génériques, qui marchent pour tous les sujets : les évaluateurs n'en tiennent pas compte." Generic introductions/conclusions that could fit any topic count for nothing — do not reward them; focus on the quality and development of the arguments.
+- Section A time: 25 minutes (transmettre des informations). Section B time: 35 minutes (exprimer et justifier son point de vue). Total: 60 minutes.
+
+CRITICAL: Assign nclcLevel (1-12) and cecrLevel (A1-C2) based on the 4 scores. The 4 scores are 0-45 each.`;
+
+  const wordCount = countWords(userText);
+  const minWords = section === "A" ? 80 : 200;
 
   const userPrompt = `${sectionDesc}
 
 TOPIC: ${topic}
 ${params.starterSentence ? `STARTER SENTENCE (Section A): ${params.starterSentence}` : ""}
 ${params.context ? `CONTEXT (Section B): ${params.context}` : ""}
+
+WORD COUNT: ${wordCount} words (minimum required: ${minWords}).
 
 CANDIDATE TEXT:
 """
@@ -731,6 +762,12 @@ Produce a JSON object wrapped in <<<JSON>>> ... >>> with EXACTLY this shape:
   "scores": { "adequation": 0, "coherence": 0, "vocabulary": 0, "grammar": 0 },
   "nclcLevel": "6",
   "cecrLevel": "B1",
+  "grammarIssues": [
+    { "topic": "passe-compose", "topicLabel": "Passé composé", "count": 2, "examples": ["J'as allé", "il a veni"] }
+  ],
+  "vocabularyIssues": [
+    { "word": "bien", "issue": "vocabulaire trop générique", "context": "le feu était bien grand" }
+  ],
   "feedback": "2-4 sentence overall feedback in French, encouraging and specific"
 }
 >>>
@@ -738,11 +775,16 @@ Produce a JSON object wrapped in <<<JSON>>> ... >>> with EXACTLY this shape:
 Rules:
 - Fill ALL arrays; if empty, use an empty array [].
 - scores: each of the 4 official TEF criteria scored 0-45 (decimals allowed). Be fair and consistent with official TEF standards.
-- nclcLevel: your assessment of the candidate's level (1-12). This is the PRIMARY output.
-- cecrLevel: corresponding CEFR level (A1, A2, B1, B2, C1, C2).
+- WORD COUNT: if the candidate's word count is below the minimum (80 for Section A, 200 for Section B), deduct significantly from "adequation" (e.g. -10 to -15 points). A text far below the minimum (e.g. half the required length) cannot score above 20/45 on adequation.
+- nclcLevel: your assessment of the candidate's level (1-12). It is used as a reference — the final level is derived from the 4 scores via the official conversion table, so keep it consistent with the scores.
+- cecrLevel: corresponding CEFR level (A1, A2, B1, B2, C1, C2), consistent with nclcLevel.
 - For Section A, pay special attention to past tenses, conditionnel, voix passive, discours indirect, and journalistic register.
-- For Section B, pay special attention to argumentation structure, connectors, vocabulary variety, and formal persuasive register.
-- registerTone: evaluate whether the candidate uses the appropriate register and tone for the task (journalistic/objective for Section A, formal/persuasive for Section B). Deduct for informal register, inconsistent tone, or inappropriate formality.
+- For Section B, pay special attention to argumentation structure, connectors, vocabulary variety, and persuasive register.
+- REGISTER: evaluate whether the candidate uses the appropriate register and tone for the task (journalistic/objective for Section A, persuasive/structured for Section B). Deduct for informal register, inconsistent tone, or inappropriate formality — reflect this deduction in the "adequation" score.
+- Section A: the candidate must bring NEW information (details, explanations, events) not present in the starter sentence. Paraphrasing or summarizing the starter sentence earns no points — deduct from "adequation" and "coherence".
+- Section B: the letter format is NOT required (official TEF Canada rule). Do NOT penalize the absence of a letter format, letterhead, or salutation. Generic introductions/conclusions that could fit any topic count for nothing — do not reward them.
+- grammarIssues: group the grammar errors from level1Errors by topic. Use the exact tag keys as topic keys (e.g. "passe-compose", "imparfait", "accord-participe-passe"). Each entry: topic (key), topicLabel (French label), count (number of errors), examples (up to 3 original erroneous snippets).
+- vocabularyIssues: list vocabulary weaknesses (imprecise, repetitive, informal or misused words). Each entry: word, issue (short French description), context (the snippet where the word appears).
 - IMPORTANT — tags on level1Errors: each error MUST have 1 or more VERY SPECIFIC linguistic tags.
   One error can belong to MULTIPLE tags. Tags must be PRECISE — use the EXACT tense, mood, or structure name.
   NEVER use vague tags like "Conjugaison" or "Temps du passé". Always pick the precise tense/mood.
@@ -808,10 +850,12 @@ CRITICAL: You MUST identify and list EVERY SINGLE ERROR in level1Errors. Be exha
   "scores": { "adequation": 30, "coherence": 28, "vocabulary": 25, "grammar": 27 },
   "nclcLevel": "6",
   "cecrLevel": "B1",
+  "grammarIssues": [{ "topic": "passe-compose", "topicLabel": "Passé composé", "count": 1, "examples": ["..."] }],
+  "vocabularyIssues": [{ "word": "...", "issue": "...", "context": "..." }],
   "feedback": "feedback in French"
 }
 >>>
-Section: ${section} (${section === "A" ? "fait divers" : "lettre"}). Topic: ${topic}.
+Section: ${section} (${section === "A" ? "fait divers" : "argumentation"}). Topic: ${topic}.
 Text: """${userText}"""`;
     const retryRaw = await callLLM(retrySystem, retryUser);
     result = extractJSON<CorrectionResult>(retryRaw);
@@ -833,10 +877,19 @@ Text: """${userText}"""`;
   result.level4Rewrite = result.level4Rewrite || "";
   result.feedback = result.feedback || "";
 
-  // ── Derive global TEF score from the LLM-assigned NCLC level ──
-  const nclc = parseInt(result.nclcLevel, 10) || 1;
+  // ── Derive NCLC level deterministically from the 4 official scores ──
+  // The official TEF Canada table maps the total (0-180) to an NCLC level.
+  // Using the deterministic conversion guarantees the level is always
+  // consistent with the criteria scores (the LLM's nclcLevel is kept as a
+  // reference only and is overridden when it contradicts the scores).
+  const total =
+    (result.scores.adequation ?? 0) +
+    (result.scores.coherence ?? 0) +
+    (result.scores.vocabulary ?? 0) +
+    (result.scores.grammar ?? 0);
+  const nclc = nclcFromTotal(total);
   result.nclcLevel = String(nclc);
-  result.cecrLevel = result.cecrLevel || cefrFromNclcLevel(nclc);
+  result.cecrLevel = cefrFromNclcLevel(nclc);
   result.globalScore = computeTefScore(nclc, result.scores);
 
   return result;
@@ -890,17 +943,17 @@ export async function evaluatePlacement(params: {
 
   const system = `CRITICAL FORMAT RULE: Your ENTIRE response must be EXACTLY one JSON object. Start with <<<JSON>>> then the JSON then >>>. No text, no markdown fences, no commentary. Failure to follow this format will cause an error.
 
-You are a senior TEF Canada examiner producing a final placement decision. The TEF Canada written expression is graded on FOUR official areas: (1) adéquation à la consigne, (2) cohérence et cohésion, (3) maîtrise du vocabulaire (richesse et précision lexicales, incl. orthographe/ponctuation/registre), (4) maîtrise de la grammaire. The overall NCLC level is the synthesis of these four areas.`;
+You are a senior TEF Canada examiner producing a final placement decision. The TEF Canada written expression is graded on FOUR official areas (CCIP grid): (1) pertinence des informations transmises (adéquation avec le sujet), (2) qualité des informations / des arguments (développement, détails, illustrations), (3) cohérence interne du texte, cohésion du texte et de la phrase, qualité des phrases et du vocabulaire, (4) orthographe et ponctuation. The overall NCLC level is the synthesis of these four areas.`;
 
   const userPrompt = `A candidate took a placement test with two sections.
 
 SECTION A (fait divers) correction:
 - NCLC: ${sectionA.nclcLevel}, CEFR: ${sectionA.cecrLevel}
-- Scores (11 sub-dimensions of the 4 official areas): ${JSON.stringify(sectionA.scores)}
+- Scores (4 official criteria, each 0-45): ${JSON.stringify(sectionA.scores)}
 
-SECTION B (lettre argumentative) correction:
+SECTION B (argumentation) correction:
 - NCLC: ${sectionB.nclcLevel}, CEFR: ${sectionB.cecrLevel}
-- Scores (11 sub-dimensions of the 4 official areas): ${JSON.stringify(sectionB.scores)}
+- Scores (4 official criteria, each 0-45): ${JSON.stringify(sectionB.scores)}
 
 Produce a JSON object wrapped in <<<JSON>>> ... >>> with EXACTLY this shape:
 <<<JSON>>>

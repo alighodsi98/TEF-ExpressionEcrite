@@ -31,7 +31,7 @@ export function AppFooter() {
           </p>
           <p className="flex items-center gap-1.5 text-[11px] text-muted-foreground/60">
             <span className="inline-block h-1 w-1 rounded-full bg-primary/40" />
-            Conçu par Ali Ghodsi pour une progression graduelle aux niveaux NCLC et CECR
+            Conçu par Ali Ghodsi pour une progression graduelle
           </p>
         </div>
       </div>

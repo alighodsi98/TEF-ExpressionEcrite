@@ -579,7 +579,7 @@ export function CorrectionDisplay({ correction, originalText, section, topic }: 
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="A">Section A — Fait divers</SelectItem>
-                  <SelectItem value="B">Section B — Lettre</SelectItem>
+                  <SelectItem value="B">Section B — Argumentation</SelectItem>
                 </SelectContent>
               </Select>
             </div>

@@ -3,7 +3,7 @@ import { db } from "@/lib/db";
 // ---------------------------------------------------------------------------
 // Official TEF Canada topics from Sujets.txt
 // Section A: Fait divers (continue the starter sentence into a news report)
-// Section B: Lettre argumentative (write a letter to the editor)
+// Section B: Argumentation (express and justify a point of view)
 // ---------------------------------------------------------------------------
 export const SEED_TOPICS: {
   section: "A" | "B";
@@ -112,7 +112,7 @@ export const SEED_TOPICS: {
   { section: "A", topic: "La chose étrange dans la voiture de David", starterSentence: "David a découvert quelque chose d'étrange dans sa voiture en allant au travail.", category: "fait_divers" },
   { section: "A", topic: "La surprise dans la boîte aux lettres", starterSentence: "Surprise dans une boîte aux lettres.", category: "fait_divers" },
 
-  // ---- Section B : Lettre argumentative ----
+  // ---- Section B : Argumentation ----
   { section: "B", topic: "L'arrêt du tabac : le tabac tue, il faut l'interdire", context: "Suite à un article paru dans votre journal sur les dangers du tabac, vous écrivez au rédacteur en chef pour défendre votre opinion sur l'interdiction du tabac, à l'aide de trois arguments étayés par des exemples concrets.", category: "sante" },
   { section: "B", topic: "La gratuité des livres permet une diffusion de la culture", context: "Votre journal a publié un article sur la gratuité des livres. Vous écrivez à la rédaction pour défendre l'idée que la culture doit être accessible à tous, en illustrant votre propos par trois arguments.", category: "culture" },
   { section: "B", topic: "Dans 20 ans, les gens ne liront plus de livres", context: "Un éditorialiste affirme que dans 20 ans, les gens ne liront plus de livres. Vous écrivez au rédacteur en chef pour donner votre point de vue, étayé par trois arguments.", category: "culture" },

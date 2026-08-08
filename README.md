@@ -10,13 +10,13 @@ Application de pratique pour l'**épreuve d'expression écrite du TEF Canada**, 
 
 ### 📝 Entraînement à l'écriture
 - **Examen de positionnement** — évalue votre niveau NCLC/CECR (sections A et B) avant de commencer.
-- **Séances complètes** — les deux sections de l'épreuve (fait divers + lettre argumentative) avec chronomètre, compteur de mots et correction IA.
+- **Séances complètes** — les deux sections de l'épreuve (fait divers + argumentation) avec chronomètre, compteur de mots et correction IA.
 - **Entraînement par sujet** — choisissez un sujet précis de la banque et entraînez-vous dessus seul.
 - **Évaluation libre** — collez n'importe quel texte pour le faire corriger.
 - **Correction quadruple par l'IA** — grammaire, vocabulaire, cohérence et style, avec score global /699 et niveau NCLC.
 
 ### 🗂️ Banque de sujets
-- Sujets officiels TEF Canada (fait divers + lettre argumentative) avec phrase de départ.
+- Sujets officiels TEF Canada (fait divers + argumentation) avec phrase de départ.
 - Recherche, filtres par section, ajout/édition/suppression et réorganisation par glisser-déposer.
 - Génération de nouveaux sujets par l'IA.
 

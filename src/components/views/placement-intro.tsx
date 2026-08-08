@@ -41,7 +41,7 @@ export function PlacementIntroView() {
         <h2 className="text-2xl font-bold tracking-tight sm:text-3xl">Examen de positionnement complet</h2>
         <p className="mx-auto mt-2 max-w-2xl text-sm leading-relaxed text-muted-foreground">
           Cet examen suit exactement le format du TEF Canada : d&apos;abord la section fait divers
-          (25 minutes), puis la lettre au rédacteur en chef (35 minutes). Une fois le temps écoulé
+          (25 minutes), puis l&apos;argumentation (35 minutes). Une fois le temps écoulé
           pour chaque section, il est impossible de revenir en arrière. Votre niveau sera déterminé
           selon les échelles NCLC et CECR.
         </p>

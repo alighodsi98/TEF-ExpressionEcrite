@@ -86,7 +86,7 @@ export function PracticeResultsView() {
       {/* Section B */}
       <div className="space-y-1">
         <h3 className="flex items-center gap-1.5 text-sm font-semibold">
-          <FileText className="h-3.5 w-3.5 text-primary" /> Section B — Lettre
+          <FileText className="h-3.5 w-3.5 text-primary" /> Section B — Argumentation
         </h3>
         <CorrectionDisplay correction={corrections.B} originalText={textB} section="B" topic={topicB} />
       </div>

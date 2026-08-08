@@ -226,7 +226,7 @@ export function TopicBankManagementView() {
             size="sm"
             onClick={() => setActiveSection("B")}
           >
-            Section B — Lettre
+            Section B — Argumentation
           </Button>
           <div className="flex-1" />
           {totalCount > 0 && (
@@ -316,7 +316,7 @@ export function TopicBankManagementView() {
                 <Label htmlFor="context">Contexte</Label>
                 <Textarea
                   id="context"
-                  placeholder="La situation ou le contexte pour la lettre..."
+                  placeholder="La situation ou le contexte pour l'argumentation..."
                   value={formContext}
                   onChange={(e) => setFormContext(e.target.value)}
                   rows={3}
@@ -393,7 +393,7 @@ function SortableTopic({ topic, onEdit, onDelete, onPractice }: { topic: TopicIt
       <div className="min-w-0 flex-1">
         <p className="text-sm font-medium truncate" dir="ltr">{topic.topic}</p>
         <div className="flex items-center gap-2 mt-0.5">
-          <Badge variant="secondary" className="text-[10px]">{topic.section === "A" ? "Fait divers" : "Lettre"}</Badge>
+          <Badge variant="secondary" className="text-[10px]">{topic.section === "A" ? "Fait divers" : "Argumentation"}</Badge>
           {topic.category && (
             <span className="text-[11px] text-muted-foreground">{topic.category}</span>
           )}

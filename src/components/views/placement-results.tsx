@@ -86,7 +86,7 @@ export function PlacementResultsView() {
           <CardHeader className="pb-1 pt-3">
             <CardTitle className="flex items-center gap-1.5 text-xs font-semibold">
               <Badge variant="secondary" className="h-4 px-1.5 text-[10px]">B</Badge>
-              Résumé — Lettre
+              Résumé — Argumentation
             </CardTitle>
           </CardHeader>
           <CardContent className="pb-3">
@@ -107,7 +107,7 @@ export function PlacementResultsView() {
       <div className="space-y-1">
         <h3 className="flex items-center gap-1.5 text-sm font-semibold">
           <FileText className="h-3.5 w-3.5 text-primary" />
-          Correction section B — Lettre
+          Correction section B — Argumentation
         </h3>
         <CorrectionDisplay correction={corrections.B} originalText="" section="B" topic={topicB} />
       </div>

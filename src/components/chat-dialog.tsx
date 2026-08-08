@@ -22,7 +22,7 @@ interface ChatMessage {
 const SUGGESTIONS = [
   "Comment utiliser le plus-que-parfait dans un fait divers ?",
   "Quelle est la différence entre « qui » et « que » ?",
-  "Donne-moi des connecteurs logiques pour une lettre argumentative.",
+  "Donne-moi des connecteurs logiques pour une argumentation.",
   "Comment accorder les adjectifs composés ?",
 ];
 

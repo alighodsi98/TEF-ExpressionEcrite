@@ -118,9 +118,9 @@ export function PracticeSectionBView() {
       onCancel={() => { clearDraft(); resetPractice(); setView("dashboard"); }}
       submitLabel={submitting ? "Correction…" : "Valider et corriger"}
       submitLoading={submitting}
-      heading="Section B — Lettre au rédacteur"
+      heading="Section B — Argumentation"
       instructions={[
-        "Lettre formelle en 4-5 paragraphes : introduction, trois arguments (avec exemple/étude), conclusion.",
+        "Exprimez et justifiez votre point de vue : introduction, arguments (avec exemple/étude), conclusion.",
         "Utilisez un vocabulaire riche, des structures avancées et des connecteurs logiques.",
         "Minimum 200 mots. Temps : 35 minutes.",
       ]}

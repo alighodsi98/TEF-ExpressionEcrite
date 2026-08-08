@@ -111,7 +111,7 @@ export function WritingStage(props: WritingStageProps) {
           <div className="flex items-center gap-2">
             <Badge variant="secondary" className="gap-1 shrink-0">
               <FileText className="h-3.5 w-3.5" />
-              Section {section === "A" ? "A — Fait divers" : "B — Lettre"}
+              Section {section === "A" ? "A — Fait divers" : "B — Argumentation"}
             </Badge>
             <div className="flex-1" />
             <div

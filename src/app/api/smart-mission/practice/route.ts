@@ -25,7 +25,7 @@ EXIGENCES POUR LES EXEMPLES (5 phrases) :
 2. Chaque phrase doit illustrer clairement "${grammarTopic.label}".
 3. Les phrases doivent être liées aux sujets de l'examen TEF Canada Expression Écrite :
    - Section A (fait divers) : faits inhabituels, accidents, découvertes, événements surprenants.
-   - Section B (lettre argumentative) : débats de société, éducation, santé, environnement, technologie.
+   - Section B (argumentation) : débats de société, éducation, santé, environnement, technologie.
 4. Niveau B2-C1 : vocabulaire riche, structures complexes mais naturelles.
 5. Chaque phrase doit être accompagnée d'une brève explication en français de pourquoi elle illustre ce point de grammaire.
 

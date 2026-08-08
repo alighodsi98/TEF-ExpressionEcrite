@@ -150,7 +150,7 @@ export function ExternalEvalView() {
               className="flex-1 gap-2"
             >
               <FileText className="h-4 w-4" />
-              Section B — Lettre
+              Section B — Argumentation
             </Button>
           </div>
         </CardContent>
@@ -167,7 +167,7 @@ export function ExternalEvalView() {
               onChange={(e) => setTopic(e.target.value)}
               placeholder={section === "A"
                 ? "Ex: Un incendie a éclaté dans un immeuble du centre-ville…"
-                : "Ex: Lettre au rédacteur concernant l'interdiction des voitures en centre-ville"}
+                : "Ex: L'interdiction des voitures en centre-ville est-elle une bonne mesure ?"}
             />
           </div>
 

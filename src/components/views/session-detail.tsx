@@ -101,7 +101,7 @@ export function SessionDetailView() {
             <div key={ex.id} className="space-y-2">
               <h3 className="flex items-center gap-2 text-lg font-bold">
                 <FileText className="h-5 w-5 text-primary" />
-                Section {ex.section} — {ex.section === "A" ? "Fait divers" : "Lettre"}
+                Section {ex.section} — {ex.section === "A" ? "Fait divers" : "Argumentation"}
                 <span className="flex items-center gap-1 text-xs font-normal text-muted-foreground">
                   <Clock className="h-3 w-3" /> {Math.round(ex.durationSec / 60)} min · {ex.wordCount} mots
                 </span>

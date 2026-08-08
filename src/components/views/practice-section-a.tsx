@@ -49,7 +49,7 @@ export function PracticeSectionAView() {
       onDurationChange={(s) => setDuration("A", s)}
       onSubmit={handleSubmit}
       onCancel={handleCancel}
-      submitLabel="Valider et passer à la lettre"
+      submitLabel="Valider et passer à l'argumentation"
       heading="Section A — Fait divers"
       instructions={[
         "Continuez la phrase d'accroche en rédigeant un article cohérent.",
